@@ -1,7 +1,7 @@
 import React from "react"; 
 import { useState } from "react";
 import ContactRow from "./ContactRow";
-    
+import { useEffect } from "react";  
 
 
 
@@ -13,10 +13,30 @@ const dummyContacts = [
 
 
 
-export default function ContactList() { 
+
+
+
+
+export default function ContactList() {                                                           // Parent Component
   const [contacts, setContacts] = useState(dummyContacts)                                         //lets me see the contacts i put in its STATE
-  console.log("Contacts: ", contacts)
-    return ( 
+  useEffect(()=>{                                                                                 // hook?
+    async function fetchContacts() {                                                              // will fetch our API
+      try {                                                                                       //if
+        const response = await fetch(
+        "https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users"
+      );
+        const result = await response.json();
+        setContacts(result);
+    } catch (error) {                                                                             //else -  fail safe if code fails
+        console.error(error);
+      }
+    }
+    fetchContacts()
+  },[])                                                                                          //Important to pass useEffect an empty array ( ,[] ) - This will ensure our component will run the effect only once
+    
+  
+  
+  return ( 
         <table>
           <thead>
             <tr>
@@ -30,7 +50,7 @@ export default function ContactList() {
               <td>Phone</td>
               </tr>
         {contacts.map((contact) => {
-          return <ContactRow key={contact.id} contact={contact} />;
+          return <ContactRow key={contact.id} contact={contact} />;                             //For each `contact`, returns a ContactRow component - specifiaclly the keys for the id and name (contact)
         })}
       </tbody>
         </table>
